@@ -1,0 +1,31 @@
+[Unit]
+Description=Minecraft Server: %i
+Wants=network.target
+After=network.target
+
+[Service]
+WorkingDirectory=/var/minecraft/%i
+User=minecraft
+Group=minecraft
+Restart=always
+
+KillMode=none
+SuccessExitStatus=0 1
+ProtectHome=true
+ProtectSystem=full
+PrivateDevices=true
+NoNewPrivileges=true
+PrivateTmp=true
+
+ExecStart=/usr/bin/screen -DmS mc-%i ./start.sh
+
+ExecStop=/usr/bin/screen -p 0 -S mc-%i -X eval 'stuff "say SERVER WILL BE SHUTTING DOWN IN 2 MINUTES"\015'
+ExecStop=/bin/sleep 120
+ExecStop=/usr/bin/screen -p 0 -S mc-%i -X eval 'stuff "say SERVER WILL BE SHUTTING DOWN IN 15 SECONDS..."\015'
+ExecStop=/bin/sleep 15
+ExecStop=/usr/bin/screen -p 0 -S mc-%i -X eval 'stuff "save-all"\015'
+ExecStop=/usr/bin/screen -p 0 -S mc-%i -X eval 'stuff "stop"\015'
+
+
+[Install]
+WantedBy=multi-user.target
